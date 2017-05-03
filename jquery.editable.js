@@ -201,16 +201,18 @@
             }
             $win.bind('keyup', adjustTextAreaHeight);
 
+
+            $textArea.bind('keydown', function (k) {
+                if (k.which === 13 && !k.shiftKey) {
+                    k.preventDefault();
+                    $textArea.trigger("enterkey");
+                }
+            });
+
             $textArea
                 .val(defaultText)
                 .blur(function() {
-                    
-                    // Prevent focus out if the click was made on textArea.
-                    if( $textArea.is(clickedElement) ) {
-                        $textArea.focus();
-                        return true;
-                    }
-                	
+
                     $currentlyEdited = false;
 
                     // Get new text and font size
@@ -245,11 +247,15 @@
                     margin: 0,
                     padding: 0,
                     height : elementHeight +'px',
-                    overflow : 'hidden'
+                    overflow : 'hidden',
+                    outline: 'none',
+                    resize: 'none',
+                    border: 'none',
+                    '-moz-appearance': 'none'
                 })
                 .css(opts.editorStyle)
-                .focus()
-                .get(0).select();
+                .focus();
+                //.get(0).select();
 
             adjustTextAreaHeight();
 
@@ -262,13 +268,7 @@
      * Event listener
      */
     editEvent = function(event) {
-        if( $currentlyEdited !== false ) {
-            // Not closing the currently open editor before opening a new
-            // editor makes things go crazy
-            $currentlyEdited.editable('close');
-            elementEditor($(this), event.data);
-        }
-        else {
+        if ($currentlyEdited === false) {
             elementEditor($(this), event.data);
         }
         return false;
@@ -375,7 +375,7 @@
         }
         return oldjQueryIs.apply(this, arguments);
     }
-    
+
     // The latest element clicked
     var clickedElement;
     $(document).mousedown(function(e) {
@@ -383,3 +383,4 @@
     });
 
 })(jQuery, window);
+
